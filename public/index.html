@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📝 Простой блог</title>
+    <title>📝 Блог с авторизацией</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -24,6 +24,93 @@
             margin: 0 auto;
         }
         
+        /* Панель авторизации */
+        .auth-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Формы */
+        .auth-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            min-width: 200px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-logout {
+            background: #ff4757;
+        }
+        
+        .btn-logout:hover {
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+        }
+        
+        /* Контент */
         .header {
             background: white;
             padding: 30px;
@@ -53,6 +140,11 @@
         
         .post-form {
             margin-bottom: 40px;
+            display: none; /* Скрыто по умолчанию */
+        }
+        
+        .post-form.active {
+            display: block;
         }
         
         textarea {
@@ -73,32 +165,7 @@
             border-color: #667eea;
         }
         
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
+        /* Посты */
         .posts-container {
             margin-top: 40px;
         }
@@ -119,10 +186,29 @@
             margin-bottom: 20px;
             border-left: 5px solid #667eea;
             transition: transform 0.2s;
+            position: relative;
         }
         
         .post:hover {
             transform: translateX(5px);
+        }
+        
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .author-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         .post-content {
@@ -162,6 +248,10 @@
             background: #ff3742;
         }
         
+        .delete-btn.hidden {
+            display: none;
+        }
+        
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -172,6 +262,14 @@
             font-size: 3em;
             margin-bottom: 20px;
             color: #ccc;
+        }
+        
+        .login-prompt {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            margin-top: 30px;
         }
         
         .loader {
@@ -192,34 +290,75 @@
         }
         
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header, .main-content {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            .post-meta {
+            .auth-panel {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+                align-items: stretch;
+            }
+            
+            .auth-form {
+                flex-direction: column;
+            }
+            
+            input {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .user-info {
+                justify-content: center;
+                text-align: center;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Панель авторизации -->
+        <div class="auth-panel" id="authPanel">
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div>
+                    <div class="user-name" id="userName"></div>
+                    <small id="userStatus"></small>
+                </div>
+            </div>
+            
+            <form class="auth-form" id="loginForm">
+                <input type="text" id="username" placeholder="Ваше имя" required>
+                <input type="password" id="password" placeholder="Пароль" required>
+                <button type="submit" class="btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+                <button type="button" class="btn" onclick="showRegister()">
+                    <i class="fas fa-user-plus"></i> Регистрация
+                </button>
+            </form>
+            
+            <form class="auth-form" id="registerForm" style="display: none;">
+                <input type="text" id="regUsername" placeholder="Имя пользователя" required>
+                <input type="password" id="regPassword" placeholder="Пароль" required>
+                <input type="password" id="regConfirm" placeholder="Повторите пароль" required>
+                <button type="submit" class="btn">
+                    <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </button>
+                <button type="button" class="btn" onclick="showLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Назад к входу
+                </button>
+            </form>
+            
+            <button class="btn btn-logout" id="logoutBtn" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Выйти
+            </button>
+        </div>
+        
+        <!-- Основной контент -->
         <div class="header">
-            <h1><i class="fas fa-pencil-alt"></i> Простой блог</h1>
-            <p class="subtitle">Пишите, делитесь, общайтесь. Без регистрации!</p>
+            <h1><i class="fas fa-pencil-alt"></i> Блог с авторизацией</h1>
+            <p class="subtitle">Только авторизованные пользователи могут публиковать посты</p>
         </div>
         
         <div class="main-content">
+            <!-- Форма создания поста (только для авторизованных) -->
             <form class="post-form" id="postForm">
                 <textarea 
                     id="postContent" 
@@ -231,10 +370,17 @@
                 </button>
             </form>
             
+            <!-- Подсказка для неавторизованных -->
+            <div class="login-prompt" id="loginPrompt">
+                <h3><i class="fas fa-lock"></i> Требуется авторизация</h3>
+                <p>Войдите или зарегистрируйтесь, чтобы публиковать посты</p>
+            </div>
+            
             <div class="loader" id="loader">
                 <i class="fas fa-spinner fa-spin"></i> Загрузка...
             </div>
             
+            <!-- Список постов -->
             <div class="posts-container">
                 <h2 class="posts-title"><i class="fas fa-stream"></i> Последние посты</h2>
                 <div id="postsList">
@@ -252,6 +398,84 @@
     <script>
         const API_URL = '/api/blog';
         let posts = [];
+        let currentUser = null;
+        
+        // Проверить авторизацию при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadPosts();
+        });
+        
+        // Проверка авторизации
+        function checkAuth() {
+            const token = localStorage.getItem('blog_token');
+            const user = localStorage.getItem('blog_user');
+            
+            if (token && user) {
+                try {
+                    currentUser = JSON.parse(user);
+                    showUserPanel();
+                    showPostForm();
+                    updateUserAvatar();
+                } catch (e) {
+                    logout();
+                }
+            } else {
+                showLoginPanel();
+            }
+        }
+        
+        // Обновить аватар
+        function updateUserAvatar() {
+            if (currentUser) {
+                const avatar = document.getElementById('userAvatar');
+                const name = document.getElementById('userName');
+                const status = document.getElementById('userStatus');
+                
+                avatar.textContent = currentUser.username.charAt(0).toUpperCase();
+                name.textContent = currentUser.username;
+                status.textContent = 'Авторизован';
+            }
+        }
+        
+        // Показать панель пользователя
+        function showUserPanel() {
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+        }
+        
+        // Показать форму входа
+        function showLoginPanel() {
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'none';
+        }
+        
+        // Показать форму регистрации
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'flex';
+        }
+        
+        // Показать форму входа
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'flex';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+        
+        // Показать/скрыть форму постинга
+        function showPostForm() {
+            document.getElementById('postForm').classList.add('active');
+            document.getElementById('loginPrompt').style.display = 'none';
+        }
+        
+        function hidePostForm() {
+            document.getElementById('postForm').classList.remove('active');
+            document.getElementById('loginPrompt').style.display = 'block';
+        }
         
         // Форматирование даты
         function formatDate(dateString) {
@@ -281,7 +505,14 @@
         async function loadPosts() {
             showLoader(true);
             try {
-                const response = await fetch(API_URL);
+                const token = localStorage.getItem('blog_token');
+                const headers = {};
+                
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(API_URL, { headers });
                 if (!response.ok) throw new Error('Ошибка загрузки');
                 
                 posts = await response.json();
@@ -314,28 +545,155 @@
             
             postCount.textContent = `Всего постов: ${posts.length}`;
             
-            postsList.innerHTML = posts.map(post => `
+            postsList.innerHTML = posts.map(post => {
+                const isOwner = currentUser && post.authorId === currentUser.id;
+                const authorInitial = post.authorName ? post.authorName.charAt(0).toUpperCase() : 'U';
+                
+                return `
                 <div class="post" data-id="${post.id}">
+                    <div class="post-author">
+                        <div class="user-avatar" style="width: 35px; height: 35px; font-size: 14px;">
+                            ${authorInitial}
+                        </div>
+                        <span>${post.authorName || 'Аноним'}</span>
+                        ${post.authorId === currentUser?.id ? 
+                            '<span class="author-badge">Вы</span>' : ''}
+                    </div>
+                    
                     <div class="post-content">${escapeHtml(post.content)}</div>
+                    
                     <div class="post-meta">
                         <div class="post-date">
                             <i class="far fa-clock"></i>
                             ${formatDate(post.createdAt || post.date)}
                         </div>
-                        <button class="delete-btn" onclick="deletePost('${post.id}')">
+                        <button class="delete-btn ${isOwner ? '' : 'hidden'}" 
+                                onclick="deletePost('${post.id}')"
+                                ${isOwner ? '' : 'disabled'}>
                             <i class="fas fa-trash"></i> Удалить
                         </button>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+        
+        // Вход
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('Заполните все поля', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Ошибка входа');
+                }
+                
+                // Сохраняем токен и пользователя
+                localStorage.setItem('blog_token', data.token);
+                localStorage.setItem('blog_user', JSON.stringify(data.user));
+                
+                currentUser = data.user;
+                showUserPanel();
+                showPostForm();
+                updateUserAvatar();
+                loadPosts();
+                
+                showMessage('Успешный вход!', 'success');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+        
+        // Регистрация
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            
+            if (!username || !password) {
+                showMessage('Заполните все поля', 'error');
+                return;
+            }
+            
+            if (password !== confirm) {
+                showMessage('Пароли не совпадают', 'error');
+                return;
+            }
+            
+            if (password.length < 4) {
+                showMessage('Пароль должен быть минимум 4 символа', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Ошибка регистрации');
+                }
+                
+                showMessage('Регистрация успешна! Теперь войдите', 'success');
+                showLogin();
+                document.getElementById('regUsername').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirm').value = '';
+                
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+        
+        // Выход
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        
+        function logout() {
+            localStorage.removeItem('blog_token');
+            localStorage.removeItem('blog_user');
+            currentUser = null;
+            showLoginPanel();
+            hidePostForm();
+            loadPosts();
+            showMessage('Вы вышли из системы', 'info');
         }
         
         // Создать новый пост
-        async function createPost(event) {
-            event.preventDefault();
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showMessage('Войдите, чтобы публиковать', 'error');
+                return;
+            }
             
             const content = document.getElementById('postContent').value.trim();
             const submitBtn = document.getElementById('submitBtn');
+            const token = localStorage.getItem('blog_token');
             
             if (!content) {
                 showMessage('Напишите что-нибудь перед отправкой', 'error');
@@ -350,53 +708,77 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ content })
                 });
                 
-                if (!response.ok) throw new Error('Ошибка публикации');
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Ошибка публикации');
+                }
                 
                 document.getElementById('postContent').value = '';
                 showMessage('Пост успешно опубликован!', 'success');
-                await loadPosts(); // Перезагружаем посты
+                await loadPosts();
             } catch (error) {
                 console.error('Ошибка:', error);
-                showMessage('Не удалось опубликовать пост', 'error');
+                showMessage(error.message, 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Опубликовать';
             }
-        }
+        });
         
         // Удалить пост
         async function deletePost(id) {
+            if (!currentUser) {
+                showMessage('Войдите, чтобы удалять посты', 'error');
+                return;
+            }
+            
             if (!confirm('Удалить этот пост?')) return;
+            
+            const token = localStorage.getItem('blog_token');
             
             try {
                 const response = await fetch(`${API_URL}?id=${id}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 
-                if (!response.ok) throw new Error('Ошибка удаления');
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Ошибка удаления');
+                }
                 
                 showMessage('Пост удалён', 'success');
-                await loadPosts(); // Перезагружаем посты
+                await loadPosts();
             } catch (error) {
                 console.error('Ошибка:', error);
-                showMessage('Не удалось удалить пост', 'error');
+                showMessage(error.message, 'error');
             }
         }
         
         // Показать сообщение
         function showMessage(text, type) {
-            // Создаем временное уведомление
+            const colors = {
+                success: '#4CAF50',
+                error: '#f44336',
+                info: '#2196F3'
+            };
+            
             const message = document.createElement('div');
             message.textContent = text;
             message.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                background: ${colors[type] || colors.info};
                 color: white;
                 padding: 15px 25px;
                 border-radius: 8px;
@@ -434,15 +816,11 @@
         `;
         document.head.appendChild(style);
         
-        // Инициализация
-        document.getElementById('postForm').addEventListener('submit', createPost);
-        
         // Автообновление каждые 30 секунд
-        loadPosts();
         setInterval(loadPosts, 30000);
         
-        // Фокус на текстовое поле при загрузке
-        document.getElementById('postContent').focus();
+        // Фокус на поле входа при загрузке
+        document.getElementById('username').focus();
     </script>
 </body>
 </html>
