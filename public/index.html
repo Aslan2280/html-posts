@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Простой блог</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .post-form {
+            margin-bottom: 40px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 150px;
+            margin-bottom: 20px;
+            transition: border 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .posts-container {
+            margin-top: 40px;
+        }
+        
+        .posts-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .post {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.2s;
+        }
+        
+        .post:hover {
+            transform: translateX(5px);
+        }
+        
+        .post-content {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            color: #333;
+        }
+        
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .post-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .delete-btn:hover {
+            background: #ff3742;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+        
+        .stats {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header, .main-content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .post-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-pencil-alt"></i> Простой блог</h1>
+            <p class="subtitle">Пишите, делитесь, общайтесь. Без регистрации!</p>
+        </div>
+        
+        <div class="main-content">
+            <form class="post-form" id="postForm">
+                <textarea 
+                    id="postContent" 
+                    placeholder="Что у вас нового?..." 
+                    required
+                ></textarea>
+                <button type="submit" class="btn" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Опубликовать
+                </button>
+            </form>
+            
+            <div class="loader" id="loader">
+                <i class="fas fa-spinner fa-spin"></i> Загрузка...
+            </div>
+            
+            <div class="posts-container">
+                <h2 class="posts-title"><i class="fas fa-stream"></i> Последние посты</h2>
+                <div id="postsList">
+                    <!-- Посты будут здесь -->
+                </div>
+            </div>
+            
+            <div class="stats">
+                <span id="postCount">Загрузка...</span>
+                <span id="lastUpdate">Обновлено: --:--</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api/blog';
+        let posts = [];
+        
+        // Форматирование даты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Показать/скрыть лоадер
+        function showLoader(show) {
+            document.getElementById('loader').style.display = show ? 'block' : 'none';
+        }
+        
+        // Обновить время последнего обновления
+        function updateLastUpdateTime() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = 
+                `Обновлено: ${now.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}`;
+        }
+        
+        // Загрузить все посты
+        async function loadPosts() {
+            showLoader(true);
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Ошибка загрузки');
+                
+                posts = await response.json();
+                renderPosts();
+                updateLastUpdateTime();
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showMessage('Не удалось загрузить посты', 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+        
+        // Отобразить посты
+        function renderPosts() {
+            const postsList = document.getElementById('postsList');
+            const postCount = document.getElementById('postCount');
+            
+            if (posts.length === 0) {
+                postsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-feather-alt"></i>
+                        <h3>Пока здесь пусто</h3>
+                        <p>Будьте первым, кто опубликует запись!</p>
+                    </div>
+                `;
+                postCount.textContent = 'Постов нет';
+                return;
+            }
+            
+            postCount.textContent = `Всего постов: ${posts.length}`;
+            
+            postsList.innerHTML = posts.map(post => `
+                <div class="post" data-id="${post.id}">
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    <div class="post-meta">
+                        <div class="post-date">
+                            <i class="far fa-clock"></i>
+                            ${formatDate(post.createdAt || post.date)}
+                        </div>
+                        <button class="delete-btn" onclick="deletePost('${post.id}')">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Создать новый пост
+        async function createPost(event) {
+            event.preventDefault();
+            
+            const content = document.getElementById('postContent').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!content) {
+                showMessage('Напишите что-нибудь перед отправкой', 'error');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Публикую...';
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content })
+                });
+                
+                if (!response.ok) throw new Error('Ошибка публикации');
+                
+                document.getElementById('postContent').value = '';
+                showMessage('Пост успешно опубликован!', 'success');
+                await loadPosts(); // Перезагружаем посты
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showMessage('Не удалось опубликовать пост', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Опубликовать';
+            }
+        }
+        
+        // Удалить пост
+        async function deletePost(id) {
+            if (!confirm('Удалить этот пост?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}?id=${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Ошибка удаления');
+                
+                showMessage('Пост удалён', 'success');
+                await loadPosts(); // Перезагружаем посты
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showMessage('Не удалось удалить пост', 'error');
+            }
+        }
+        
+        // Показать сообщение
+        function showMessage(text, type) {
+            // Создаем временное уведомление
+            const message = document.createElement('div');
+            message.textContent = text;
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        }
+        
+        // Экранирование HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+        
+        // Добавить стили для анимаций
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Инициализация
+        document.getElementById('postForm').addEventListener('submit', createPost);
+        
+        // Автообновление каждые 30 секунд
+        loadPosts();
+        setInterval(loadPosts, 30000);
+        
+        // Фокус на текстовое поле при загрузке
+        document.getElementById('postContent').focus();
+    </script>
+</body>
+</html>
