@@ -2,27 +2,21 @@ import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 
-// Путь к файлу базы данных
-const DB_PATH = path.join('/tmp', 'blog-db.json');
+const DB_PATH = path.join('/tmp', 'blog-db-shop.json');
 
 // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
-
-// Хэширование пароля
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-// Генерация токена
 function generateToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
-// Генерация ID
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-// Чтение тела запроса
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
@@ -32,23 +26,39 @@ function readBody(req) {
   });
 }
 
-// ========== РАБОТА С БАЗОЙ ДАННЫХ ==========
-
-// Инициализация базы данных
+// ========== БАЗА ДАННЫХ ==========
 async function initDB() {
   try {
     await fs.access(DB_PATH);
     console.log('База данных существует');
   } catch {
-    console.log('Создаем новую базу данных');
+    console.log('Создаем новую базу данных с магазином');
+    
+    // Ассортимент магазина
+    const shopItems = [
+      { id: 'gift1', name: '🎁 Подарок', emoji: '🎁', price: 50, description: 'Простой подарок', category: 'basic' },
+      { id: 'gift2', name: '❤️ Сердечко', emoji: '❤️', price: 100, description: 'Символ любви', category: 'hearts' },
+      { id: 'gift3', name: '⭐ Звезда', emoji: '⭐', price: 150, description: 'Звезда удачи', category: 'stars' },
+      { id: 'gift4', name: '🏆 Трофей', emoji: '🏆', price: 300, description: 'За достижения', category: 'trophies' },
+      { id: 'gift5', name: '👑 Корона', emoji: '👑', price: 500, description: 'Королевский подарок', category: 'premium' },
+      { id: 'gift6', name: '🎂 Торт', emoji: '🎂', price: 200, description: 'Сладкий сюрприз', category: 'food' },
+      { id: 'gift7', name: '⚡ Молния', emoji: '⚡', price: 250, description: 'Энергия и скорость', category: 'energy' },
+      { id: 'gift8', name: '💎 Алмаз', emoji: '💎', price: 1000, description: 'Роскошный подарок', category: 'premium' },
+      { id: 'gift9', name: '🎈 Шарик', emoji: '🎈', price: 30, description: 'Веселый шарик', category: 'basic' },
+      { id: 'gift10', name: '🎨 Палитра', emoji: '🎨', price: 180, description: 'Для творческих людей', category: 'art' }
+    ];
+    
     const initialData = {
       users: [
         {
-          id: 'admin',
+          id: 'admin1',
           username: 'admin',
           passwordHash: hashPassword('admin123'),
           role: 'admin',
-          quanta: 1000,
+          quanta: 5000,
+          inventory: [],
+          giftsReceived: [],
+          giftsSent: [],
           createdAt: new Date().toISOString()
         },
         {
@@ -56,31 +66,41 @@ async function initDB() {
           username: 'user',
           passwordHash: hashPassword('user123'),
           role: 'user',
-          quanta: 100,
+          quanta: 500,
+          inventory: [
+            { itemId: 'gift1', emoji: '🎁', name: '🎁 Подарок', receivedAt: new Date().toISOString() }
+          ],
+          giftsReceived: [],
+          giftsSent: [],
           createdAt: new Date().toISOString()
         }
       ],
       posts: [
         {
           id: 'post1',
-          content: 'Добро пожаловать в блог!',
-          authorId: 'admin',
+          content: 'Добро пожаловать в блог с магазином подарков!',
+          authorId: 'admin1',
           authorName: 'admin',
           createdAt: new Date().toISOString()
         },
         {
           id: 'post2',
-          content: 'Здесь можно писать посты и зарабатывать кванты!',
+          content: 'Здесь можно покупать подарки за кванты и дарить их другим!',
           authorId: 'user1',
           authorName: 'user',
           createdAt: new Date().toISOString()
         }
       ],
-      sessions: [],
+      shop: {
+        items: shopItems,
+        lastUpdated: new Date().toISOString()
+      },
       transactions: [],
+      sessions: [],
+      gifts: [], // История всех подарков
       settings: {
         quantaPerPost: 5,
-        version: '2.0'
+        version: '3.0'
       }
     };
     
@@ -89,46 +109,35 @@ async function initDB() {
   }
 }
 
-// Чтение базы данных
 async function readDB() {
   await initDB();
   const data = await fs.readFile(DB_PATH, 'utf-8');
   return JSON.parse(data);
 }
 
-// Запись в базу данных
 async function writeDB(data) {
   await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
 }
 
-// Валидация токена
+// ========== ПОЛЬЗОВАТЕЛЬСКИЕ ФУНКЦИИ ==========
 async function validateToken(token) {
   try {
     const db = await readDB();
     const session = db.sessions?.find(s => s.token === token);
     
-    if (!session) {
-      console.log('Сессия не найдена');
-      return null;
-    }
+    if (!session) return null;
     
-    // Проверяем срок действия (30 дней для админов, 1 день для пользователей)
     const tokenAge = Date.now() - new Date(session.createdAt).getTime();
     const maxAge = session.role === 'admin' ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
     
     if (tokenAge > maxAge) {
-      console.log('Токен просрочен');
-      // Удаляем просроченную сессию
       db.sessions = db.sessions.filter(s => s.token !== token);
       await writeDB(db);
       return null;
     }
     
     const user = db.users.find(u => u.id === session.userId);
-    if (!user) {
-      console.log('Пользователь не найден');
-      return null;
-    }
+    if (!user) return null;
     
     return {
       id: user.id,
@@ -143,19 +152,14 @@ async function validateToken(token) {
   }
 }
 
-// Добавить транзакцию квантов
 async function addTransaction(userId, amount, reason, adminId = null) {
   const db = await readDB();
   const user = db.users.find(u => u.id === userId);
   
-  if (!user) {
-    throw new Error('Пользователь не найден');
-  }
+  if (!user) throw new Error('Пользователь не найден');
   
-  // Обновляем баланс пользователя
   user.quanta = (user.quanta || 0) + amount;
   
-  // Создаем запись о транзакции
   const transaction = {
     id: generateId(),
     userId,
@@ -172,24 +176,92 @@ async function addTransaction(userId, amount, reason, adminId = null) {
   return user.quanta;
 }
 
-// ========== ОСНОВНОЙ ОБРАБОТЧИК ==========
+async function addToInventory(userId, item) {
+  const db = await readDB();
+  const user = db.users.find(u => u.id === userId);
+  
+  if (!user) throw new Error('Пользователь не найден');
+  
+  if (!user.inventory) user.inventory = [];
+  
+  const inventoryItem = {
+    id: generateId(),
+    itemId: item.id,
+    emoji: item.emoji,
+    name: item.name,
+    purchasedAt: new Date().toISOString(),
+    canSend: true
+  };
+  
+  user.inventory.push(inventoryItem);
+  
+  await writeDB(db);
+  return inventoryItem;
+}
 
+async function sendGift(senderId, receiverId, giftId, message = '') {
+  const db = await readDB();
+  
+  const sender = db.users.find(u => u.id === senderId);
+  const receiver = db.users.find(u => u.id === receiverId);
+  
+  if (!sender || !receiver) {
+    throw new Error('Пользователь не найден');
+  }
+  
+  // Найти подарок в инвентаре отправителя
+  const giftIndex = sender.inventory?.findIndex(item => item.id === giftId);
+  if (giftIndex === -1 || giftIndex === undefined) {
+    throw new Error('Подарок не найден в инвентаре');
+  }
+  
+  const gift = sender.inventory[giftIndex];
+  
+  // Удаляем у отправителя
+  sender.inventory.splice(giftIndex, 1);
+  
+  // Добавляем получателю
+  if (!receiver.giftsReceived) receiver.giftsReceived = [];
+  if (!sender.giftsSent) sender.giftsSent = [];
+  
+  const giftRecord = {
+    id: generateId(),
+    giftId: gift.itemId,
+    emoji: gift.emoji,
+    name: gift.name,
+    fromUserId: senderId,
+    fromUsername: sender.username,
+    toUserId: receiverId,
+    toUsername: receiver.username,
+    message: message,
+    sentAt: new Date().toISOString()
+  };
+  
+  receiver.giftsReceived.unshift(giftRecord);
+  sender.giftsSent.unshift(giftRecord);
+  
+  // Сохраняем в общую историю подарков
+  if (!db.gifts) db.gifts = [];
+  db.gifts.unshift(giftRecord);
+  
+  await writeDB(db);
+  return giftRecord;
+}
+
+// ========== ОСНОВНОЙ ОБРАБОТЧИК ==========
 export default async function handler(req, res) {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   
-  // Настраиваем CORS
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400');
   
-  // Обрабатываем preflight запросы
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
   
   try {
-    // Разбираем URL
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname;
     
@@ -197,97 +269,77 @@ export default async function handler(req, res) {
     
     // Регистрация
     if (pathname === '/api/blog/register' && req.method === 'POST') {
-      console.log('Регистрация нового пользователя');
-      
       const body = await readBody(req);
-      let data;
-      
-      try {
-        data = JSON.parse(body);
-      } catch (e) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Неверный формат данных' 
-        });
-      }
-      
-      const { username, password } = data;
+      const { username, password } = JSON.parse(body);
       
       if (!username || !password) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Заполните все поля' 
-        });
+        return res.status(400).json({ success: false, error: 'Заполните все поля' });
       }
       
       if (username.length < 3 || username.length > 20) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Имя пользователя должно быть от 3 до 20 символов' 
-        });
+        return res.status(400).json({ success: false, error: 'Имя пользователя 3-20 символов' });
       }
       
       if (password.length < 4) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Пароль должен быть минимум 4 символа' 
-        });
+        return res.status(400).json({ success: false, error: 'Пароль минимум 4 символа' });
       }
       
       const db = await readDB();
       
-      // Проверяем, существует ли пользователь
       if (db.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Пользователь с таким именем уже существует' 
-        });
+        return res.status(400).json({ success: false, error: 'Пользователь уже существует' });
       }
       
-      // Создаем нового пользователя
       const newUser = {
         id: generateId(),
         username,
         passwordHash: hashPassword(password),
         role: 'user',
-        quanta: 50, // Начальный бонус
+        quanta: 100, // Начальный баланс
+        inventory: [
+          { 
+            id: generateId(),
+            itemId: 'welcome_gift',
+            emoji: '🎁',
+            name: 'Приветственный подарок',
+            purchasedAt: new Date().toISOString(),
+            canSend: true
+          }
+        ],
+        giftsReceived: [],
+        giftsSent: [],
         createdAt: new Date().toISOString()
       };
       
       db.users.push(newUser);
       
-      // Записываем начальную транзакцию
-      await addTransaction(newUser.id, 50, 'Начальный бонус');
+      // Начальная транзакция
+      const transaction = {
+        id: generateId(),
+        userId: newUser.id,
+        amount: 100,
+        reason: 'Начальный бонус',
+        timestamp: new Date().toISOString()
+      };
+      
+      if (!db.transactions) db.transactions = [];
+      db.transactions.unshift(transaction);
+      
+      await writeDB(db);
       
       return res.status(201).json({ 
         success: true,
-        message: 'Регистрация успешна' 
+        message: 'Регистрация успешна! Вы получили 100 квантов и подарок 🎁'
       });
     }
     
     // Вход
     if (pathname === '/api/blog/login' && req.method === 'POST') {
-      console.log('Попытка входа');
-      
       const body = await readBody(req);
-      let data;
-      
-      try {
-        data = JSON.parse(body);
-      } catch (e) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Неверный формат данных' 
-        });
-      }
-      
-      const { username, password } = data;
+      const { username, password } = JSON.parse(body);
       
       if (!username || !password) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Заполните все поля' 
-        });
+        return res.status(400).json({ success: false, error: 'Заполните все поля' });
       }
       
       const db = await readDB();
@@ -297,13 +349,9 @@ export default async function handler(req, res) {
       );
       
       if (!user) {
-        return res.status(401).json({ 
-          success: false,
-          error: 'Неверное имя пользователя или пароль' 
-        });
+        return res.status(401).json({ success: false, error: 'Неверные данные' });
       }
       
-      // Создаем сессию
       const token = generateToken();
       const session = {
         token,
@@ -316,28 +364,35 @@ export default async function handler(req, res) {
       db.sessions.push(session);
       await writeDB(db);
       
-      // Возвращаем данные пользователя
       const userData = {
         id: user.id,
         username: user.username,
         role: user.role,
         quanta: user.quanta || 0,
+        inventoryCount: user.inventory?.length || 0,
         createdAt: user.createdAt
       };
-      
-      console.log('Успешный вход пользователя:', user.username);
       
       return res.status(200).json({
         success: true,
         token,
         user: userData,
-        message: 'Вход выполнен успешно'
+        message: 'Вход выполнен'
+      });
+    }
+    
+    // Магазин (публичный)
+    if (pathname === '/api/blog/shop' && req.method === 'GET') {
+      const db = await readDB();
+      
+      return res.status(200).json({
+        success: true,
+        shop: db.shop,
+        message: 'Ассортимент магазина'
       });
     }
     
     // ========== PROTECTED ROUTES ==========
-    
-    // Проверяем авторизацию для защищенных маршрутов
     const authHeader = req.headers.authorization;
     let currentUser = null;
     
@@ -346,18 +401,16 @@ export default async function handler(req, res) {
       currentUser = await validateToken(token);
     }
     
-    // Получить все посты
+    // ========== ПОСТЫ ==========
+    
+    // Все посты
     if (pathname === '/api/blog' && req.method === 'GET') {
-      console.log('Получение всех постов');
-      
       const db = await readDB();
       
-      // Сортируем посты по дате (новые сверху)
       const sortedPosts = db.posts.sort((a, b) => 
         new Date(b.createdAt) - new Date(a.createdAt)
       );
       
-      // Форматируем ответ
       const posts = sortedPosts.map(post => ({
         id: post.id,
         content: post.content,
@@ -367,61 +420,24 @@ export default async function handler(req, res) {
         canDelete: currentUser ? (currentUser.id === post.authorId || currentUser.role === 'admin') : false
       }));
       
-      return res.status(200).json({
-        success: true,
-        posts
-      });
+      return res.status(200).json({ success: true, posts });
     }
     
     // Создать пост
     if (pathname === '/api/blog' && req.method === 'POST') {
-      console.log('Создание нового поста');
-      
       if (!currentUser) {
-        return res.status(401).json({ 
-          success: false,
-          error: 'Требуется авторизация' 
-        });
+        return res.status(401).json({ success: false, error: 'Требуется авторизация' });
       }
       
       const body = await readBody(req);
-      let data;
+      const { content } = JSON.parse(body);
       
-      try {
-        data = JSON.parse(body);
-      } catch (e) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Неверный формат данных' 
-        });
-      }
-      
-      const { content } = data;
-      
-      if (!content || typeof content !== 'string') {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Текст поста обязателен' 
-        });
-      }
-      
-      if (content.trim().length === 0) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Текст поста не может быть пустым' 
-        });
-      }
-      
-      if (content.length > 10000) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Пост слишком длинный (максимум 10000 символов)' 
-        });
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ success: false, error: 'Текст не может быть пустым' });
       }
       
       const db = await readDB();
       
-      // Создаем новый пост
       const newPost = {
         id: generateId(),
         content: content.trim(),
@@ -432,104 +448,65 @@ export default async function handler(req, res) {
       
       db.posts.unshift(newPost);
       
-      // Начисляем кванты за пост
+      // Начисляем кванты
       const quantaEarned = db.settings.quantaPerPost || 5;
-      const newBalance = await addTransaction(
-        currentUser.id, 
-        quantaEarned, 
-        'Награда за пост'
-      );
-      
-      // Ограничиваем количество постов
-      if (db.posts.length > 1000) {
-        db.posts = db.posts.slice(0, 1000);
-      }
+      await addTransaction(currentUser.id, quantaEarned, 'Награда за пост');
       
       await writeDB(db);
-      
-      console.log('Пост создан, начислено квантов:', quantaEarned);
       
       return res.status(201).json({
         success: true,
         post: newPost,
         quantaEarned,
-        newBalance,
-        message: 'Пост успешно создан'
+        message: 'Пост создан! +5 квантов'
       });
     }
     
     // Удалить пост
     if (pathname === '/api/blog' && req.method === 'DELETE') {
-      console.log('Удаление поста');
-      
       if (!currentUser) {
-        return res.status(401).json({ 
-          success: false,
-          error: 'Требуется авторизация' 
-        });
+        return res.status(401).json({ success: false, error: 'Требуется авторизация' });
       }
       
       const id = url.searchParams.get('id');
-      
       if (!id) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'ID поста обязателен' 
-        });
+        return res.status(400).json({ success: false, error: 'ID поста обязателен' });
       }
       
       const db = await readDB();
       const post = db.posts.find(p => p.id === id);
       
       if (!post) {
-        return res.status(404).json({ 
-          success: false,
-          error: 'Пост не найден' 
-        });
+        return res.status(404).json({ success: false, error: 'Пост не найден' });
       }
       
-      // Проверяем права доступа
       if (post.authorId !== currentUser.id && currentUser.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false,
-          error: 'Недостаточно прав для удаления этого поста' 
-        });
+        return res.status(403).json({ success: false, error: 'Недостаточно прав' });
       }
       
-      // Удаляем пост
       db.posts = db.posts.filter(p => p.id !== id);
       await writeDB(db);
       
-      const deletedByAdmin = currentUser.role === 'admin' && post.authorId !== currentUser.id;
-      
-      console.log('Пост удален, удален админом:', deletedByAdmin);
-      
       return res.status(200).json({ 
         success: true,
-        message: 'Пост успешно удален',
-        deletedByAdmin
+        message: 'Пост удален',
+        deletedByAdmin: currentUser.role === 'admin' && post.authorId !== currentUser.id
       });
     }
     
-    // Получить информацию о себе
+    // ========== ПОЛЬЗОВАТЕЛЬ ==========
+    
+    // Мой профиль
     if (pathname === '/api/blog/me' && req.method === 'GET') {
-      console.log('Получение информации о пользователе');
-      
       if (!currentUser) {
-        return res.status(401).json({ 
-          success: false,
-          error: 'Требуется авторизация' 
-        });
+        return res.status(401).json({ success: false, error: 'Требуется авторизация' });
       }
       
       const db = await readDB();
       const user = db.users.find(u => u.id === currentUser.id);
       
       if (!user) {
-        return res.status(404).json({ 
-          success: false,
-          error: 'Пользователь не найден' 
-        });
+        return res.status(404).json({ success: false, error: 'Пользователь не найден' });
       }
       
       const userData = {
@@ -538,10 +515,13 @@ export default async function handler(req, res) {
         role: user.role,
         quanta: user.quanta || 0,
         createdAt: user.createdAt,
-        postCount: db.posts.filter(p => p.authorId === user.id).length
+        postCount: db.posts.filter(p => p.authorId === user.id).length,
+        inventory: user.inventory || [],
+        giftsReceived: user.giftsReceived?.slice(0, 10) || [],
+        giftsSent: user.giftsSent?.slice(0, 10) || []
       };
       
-      // Получаем последние транзакции
+      // Последние транзакции
       const recentTransactions = db.transactions
         ?.filter(t => t.userId === user.id)
         ?.slice(0, 10) || [];
@@ -553,17 +533,138 @@ export default async function handler(req, res) {
       });
     }
     
-    // ========== ADMIN ROUTES ==========
+    // ========== МАГАЗИН (защищенные маршруты) ==========
     
-    // Получить статистику (админ)
-    if (pathname === '/api/blog/admin/stats' && req.method === 'GET') {
-      console.log('Получение статистики (админ)');
+    // Купить предмет
+    if (pathname === '/api/blog/shop/buy' && req.method === 'POST') {
+      if (!currentUser) {
+        return res.status(401).json({ success: false, error: 'Требуется авторизация' });
+      }
       
-      if (!currentUser || currentUser.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false,
-          error: 'Требуются права администратора' 
+      const body = await readBody(req);
+      const { itemId } = JSON.parse(body);
+      
+      if (!itemId) {
+        return res.status(400).json({ success: false, error: 'Выберите предмет' });
+      }
+      
+      const db = await readDB();
+      const user = db.users.find(u => u.id === currentUser.id);
+      const item = db.shop.items.find(i => i.id === itemId);
+      
+      if (!item) {
+        return res.status(404).json({ success: false, error: 'Товар не найден' });
+      }
+      
+      if (user.quanta < item.price) {
+        return res.status(400).json({ 
+          success: false, 
+          error: `Недостаточно квантов. Нужно: ${item.price}, у вас: ${user.quanta}` 
         });
+      }
+      
+      // Списываем кванты
+      user.quanta -= item.price;
+      
+      // Добавляем в инвентарь
+      const inventoryItem = {
+        id: generateId(),
+        itemId: item.id,
+        emoji: item.emoji,
+        name: item.name,
+        price: item.price,
+        purchasedAt: new Date().toISOString(),
+        canSend: true
+      };
+      
+      if (!user.inventory) user.inventory = [];
+      user.inventory.push(inventoryItem);
+      
+      // Записываем транзакцию
+      const transaction = {
+        id: generateId(),
+        userId: user.id,
+        amount: -item.price,
+        reason: `Покупка: ${item.name}`,
+        timestamp: new Date().toISOString()
+      };
+      
+      db.transactions.unshift(transaction);
+      await writeDB(db);
+      
+      return res.status(200).json({
+        success: true,
+        item: inventoryItem,
+        newBalance: user.quanta,
+        message: `Вы купили ${item.emoji} ${item.name} за ${item.price} квантов!`
+      });
+    }
+    
+    // Отправить подарок
+    if (pathname === '/api/blog/gifts/send' && req.method === 'POST') {
+      if (!currentUser) {
+        return res.status(401).json({ success: false, error: 'Требуется авторизация' });
+      }
+      
+      const body = await readBody(req);
+      const { receiverId, giftId, message } = JSON.parse(body);
+      
+      if (!receiverId || !giftId) {
+        return res.status(400).json({ success: false, error: 'Заполните все поля' });
+      }
+      
+      if (currentUser.id === receiverId) {
+        return res.status(400).json({ success: false, error: 'Нельзя отправить подарок самому себе' });
+      }
+      
+      try {
+        const giftRecord = await sendGift(currentUser.id, receiverId, giftId, message || '');
+        
+        return res.status(200).json({
+          success: true,
+          gift: giftRecord,
+          message: `Вы отправили ${giftRecord.emoji} пользователю ${giftRecord.toUsername}!`
+        });
+      } catch (error) {
+        return res.status(400).json({ success: false, error: error.message });
+      }
+    }
+    
+    // Поиск пользователей для отправки подарков
+    if (pathname === '/api/blog/users/search' && req.method === 'GET') {
+      if (!currentUser) {
+        return res.status(401).json({ success: false, error: 'Требуется авторизация' });
+      }
+      
+      const search = url.searchParams.get('q') || '';
+      const db = await readDB();
+      
+      let users = db.users
+        .filter(u => u.id !== currentUser.id) // Исключаем себя
+        .map(u => ({
+          id: u.id,
+          username: u.username,
+          role: u.role
+        }));
+      
+      if (search) {
+        users = users.filter(u => 
+          u.username.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+      
+      return res.status(200).json({
+        success: true,
+        users: users.slice(0, 20)
+      });
+    }
+    
+    // ========== АДМИНКА ==========
+    
+    // Статистика
+    if (pathname === '/api/blog/admin/stats' && req.method === 'GET') {
+      if (!currentUser || currentUser.role !== 'admin') {
+        return res.status(403).json({ success: false, error: 'Требуются права администратора' });
       }
       
       const db = await readDB();
@@ -572,25 +673,18 @@ export default async function handler(req, res) {
         totalUsers: db.users.length,
         totalPosts: db.posts.length,
         totalQuanta: db.users.reduce((sum, u) => sum + (u.quanta || 0), 0),
-        settings: db.settings,
-        recentTransactions: db.transactions?.slice(0, 10) || []
+        totalGifts: db.gifts?.length || 0,
+        shopItems: db.shop.items.length,
+        settings: db.settings
       };
       
-      return res.status(200).json({
-        success: true,
-        stats
-      });
+      return res.status(200).json({ success: true, stats });
     }
     
-    // Получить всех пользователей (админ)
+    // Все пользователи
     if (pathname === '/api/blog/admin/users' && req.method === 'GET') {
-      console.log('Получение списка пользователей (админ)');
-      
       if (!currentUser || currentUser.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false,
-          error: 'Требуются права администратора' 
-        });
+        return res.status(403).json({ success: false, error: 'Требуются права администратора' });
       }
       
       const db = await readDB();
@@ -600,64 +694,29 @@ export default async function handler(req, res) {
         username: user.username,
         role: user.role,
         quanta: user.quanta || 0,
+        inventoryCount: user.inventory?.length || 0,
         createdAt: user.createdAt,
         postCount: db.posts.filter(p => p.authorId === user.id).length
       }));
       
-      return res.status(200).json({
-        success: true,
-        users
-      });
+      return res.status(200).json({ success: true, users });
     }
     
-    // Добавить кванты пользователю (админ)
+    // Добавить кванты
     if (pathname === '/api/blog/admin/add-quanta' && req.method === 'POST') {
-      console.log('Добавление квантов (админ)');
-      
       if (!currentUser || currentUser.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false,
-          error: 'Требуются права администратора' 
-        });
+        return res.status(403).json({ success: false, error: 'Требуются права администратора' });
       }
       
       const body = await readBody(req);
-      let data;
-      
-      try {
-        data = JSON.parse(body);
-      } catch (e) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Неверный формат данных' 
-        });
-      }
-      
-      const { userId, amount, reason } = data;
+      const { userId, amount, reason } = JSON.parse(body);
       
       if (!userId || !amount || !reason) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Заполните все поля' 
-        });
-      }
-      
-      if (typeof amount !== 'number' || amount <= 0) {
-        return res.status(400).json({ 
-          success: false,
-          error: 'Некорректная сумма' 
-        });
+        return res.status(400).json({ success: false, error: 'Заполните все поля' });
       }
       
       try {
-        const newBalance = await addTransaction(
-          userId, 
-          amount, 
-          reason, 
-          currentUser.id
-        );
-        
-        console.log(`Админ ${currentUser.username} добавил ${amount} квантов пользователю ${userId}`);
+        const newBalance = await addTransaction(userId, amount, reason, currentUser.id);
         
         return res.status(200).json({
           success: true,
@@ -665,66 +724,28 @@ export default async function handler(req, res) {
           newBalance
         });
       } catch (error) {
-        return res.status(404).json({ 
-          success: false,
-          error: error.message 
-        });
+        return res.status(404).json({ success: false, error: error.message });
       }
     }
     
-    // Получить информацию о пользователе (админ)
-    if (pathname.startsWith('/api/blog/admin/user/') && req.method === 'GET') {
-      console.log('Получение информации о пользователе (админ)');
-      
-      if (!currentUser || currentUser.role !== 'admin') {
-        return res.status(403).json({ 
-          success: false,
-          error: 'Требуются права администратора' 
-        });
-      }
-      
-      const userId = pathname.split('/').pop();
-      const db = await readDB();
-      const user = db.users.find(u => u.id === userId);
-      
-      if (!user) {
-        return res.status(404).json({ 
-          success: false,
-          error: 'Пользователь не найден' 
-        });
-      }
-      
-      const userData = {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        quanta: user.quanta || 0,
-        createdAt: user.createdAt,
-        posts: db.posts.filter(p => p.authorId === userId).slice(0, 10),
-        transactions: db.transactions?.filter(t => t.userId === userId).slice(0, 10) || []
-      };
-      
-      return res.status(200).json({
-        success: true,
-        user: userData
-      });
-    }
-    
-    // Если маршрут не найден
+    // Маршрут не найден
     return res.status(404).json({
       success: false,
       error: 'Маршрут не найден',
       availableRoutes: [
         'POST /api/blog/register',
         'POST /api/blog/login',
+        'GET /api/blog/shop',
         'GET /api/blog (auth)',
         'POST /api/blog (auth)',
         'DELETE /api/blog?id= (auth)',
         'GET /api/blog/me (auth)',
+        'POST /api/blog/shop/buy (auth)',
+        'POST /api/blog/gifts/send (auth)',
+        'GET /api/blog/users/search (auth)',
         'GET /api/blog/admin/stats (admin)',
         'GET /api/blog/admin/users (admin)',
-        'POST /api/blog/admin/add-quanta (admin)',
-        'GET /api/blog/admin/user/:id (admin)'
+        'POST /api/blog/admin/add-quanta (admin)'
       ]
     });
     
@@ -734,8 +755,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Внутренняя ошибка сервера',
-      message: process.env.NODE_ENV === 'development' ? error.message : undefined,
-      timestamp: new Date().toISOString()
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 }
