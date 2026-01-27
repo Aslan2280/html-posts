@@ -4,301 +4,234 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📝 Блог с квантами</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background: #f0f2f5;
             padding: 20px;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 20px;
+        }
+        
+        /* Шапка */
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1890ff;
         }
         
         /* Панель авторизации */
-        .auth-panel {
+        .auth-box {
             background: white;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .user-info {
-            margin-bottom: 20px;
-        }
-        
-        .user-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .user-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .user-details h3 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .user-details p {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .quanta-badge {
-            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-            color: #333;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        /* Боковая панель */
-        .sidebar {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            height: fit-content;
-        }
-        
-        .nav-menu {
-            list-style: none;
-            margin-bottom: 30px;
-        }
-        
-        .nav-item {
-            padding: 12px 15px;
             border-radius: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .auth-form {
             display: flex;
-            align-items: center;
             gap: 10px;
-            transition: background 0.3s;
+            flex-wrap: wrap;
         }
         
-        .nav-item:hover {
-            background: #f5f5f5;
-        }
-        
-        .nav-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .admin-badge {
-            background: #ff4757;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: auto;
-        }
-        
-        /* Основной контент */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .content-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: none;
-        }
-        
-        .content-section.active {
-            display: block;
-        }
-        
-        /* Формы */
-        input, textarea, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            font-family: inherit;
-        }
-        
-        textarea {
-            min-height: 150px;
-            resize: vertical;
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex: 1;
+            min-width: 200px;
         }
         
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1890ff;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
         
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background: #40a9ff;
         }
         
-        .btn-logout {
-            background: #ff4757;
+        .btn-danger {
+            background: #ff4d4f;
         }
         
-        .btn-admin {
-            background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+        .btn-danger:hover {
+            background: #ff7875;
+        }
+        
+        /* Информация пользователя */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-badge {
+            background: #1890ff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .user-badge.admin {
+            background: #ff4d4f;
+        }
+        
+        .quanta-badge {
+            background: #faad14;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        /* Навигация */
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .nav-btn.active {
+            background: #1890ff;
+            color: white;
+        }
+        
+        /* Контент */
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 300px;
+        }
+        
+        /* Форма поста */
+        .post-form {
+            margin-bottom: 30px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            resize: vertical;
+            min-height: 100px;
+            font-size: 16px;
         }
         
         /* Посты */
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
         .post {
-            background: #f8f9ff;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border-left: 5px solid #667eea;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #1890ff;
         }
         
         .post-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .post-author {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .post-author-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
             font-weight: bold;
+            color: #333;
         }
         
-        .post-content {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-        }
-        
-        .post-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .post-date {
             color: #666;
             font-size: 14px;
         }
         
+        .post-content {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
         /* Админка */
+        .admin-section {
+            margin-top: 20px;
+        }
+        
         .admin-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         
         .admin-card {
-            background: #f8f9ff;
-            padding: 20px;
-            border-radius: 15px;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 5px;
         }
         
-        .admin-card h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .admin-stats {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            gap: 10px;
         }
         
-        .stat-item {
+        .stat {
             background: white;
             padding: 15px;
-            border-radius: 10px;
             text-align: center;
+            border-radius: 5px;
         }
         
         .stat-value {
             font-size: 24px;
             font-weight: bold;
-            color: #667eea;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .user-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .user-actions {
-            display: flex;
-            gap: 10px;
+            color: #1890ff;
         }
         
         /* Уведомления */
@@ -306,165 +239,83 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
+            padding: 15px 20px;
+            border-radius: 5px;
             color: white;
             z-index: 1000;
             animation: slideIn 0.3s ease;
         }
         
-        .notification.success {
-            background: #4CAF50;
-        }
-        
-        .notification.error {
-            background: #f44336;
-        }
-        
-        .notification.info {
-            background: #2196F3;
-        }
-        
-        .notification.warning {
-            background: #ff9800;
-        }
+        .success { background: #52c41a; }
+        .error { background: #ff4d4f; }
+        .info { background: #1890ff; }
         
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
         
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
+        /* Загрузчик */
+        .loader {
+            text-align: center;
+            padding: 20px;
+            color: #1890ff;
         }
         
         /* Адаптивность */
         @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
             
-            .sidebar {
-                order: 2;
+            .auth-form {
+                flex-direction: column;
+            }
+            
+            input {
+                min-width: auto;
+            }
+            
+            .nav {
+                overflow-x: auto;
+                flex-wrap: nowrap;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Боковая панель -->
-        <div class="sidebar">
-            <div class="auth-panel" id="authPanel">
-                <div class="user-info" id="userInfo" style="display: none;">
-                    <div class="user-header">
-                        <div class="user-avatar" id="userAvatar">U</div>
-                        <div class="user-details">
-                            <h3 id="userName"></h3>
-                            <p id="userRole"></p>
-                            <div class="quanta-badge" id="quantaBadge">
-                                <i class="fas fa-gem"></i>
-                                <span id="quantaAmount">0</span> квантов
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-logout" id="logoutBtn" style="width: 100%;">
-                        <i class="fas fa-sign-out-alt"></i> Выйти
-                    </button>
-                </div>
-                
-                <form class="auth-form" id="loginForm">
-                    <input type="text" id="username" placeholder="Имя пользователя" required>
-                    <input type="password" id="password" placeholder="Пароль" required>
-                    <button type="submit" class="btn" style="width: 100%;">
-                        <i class="fas fa-sign-in-alt"></i> Войти
-                    </button>
-                    <button type="button" class="btn" onclick="showRegister()" style="width: 100%; margin-top: 10px;">
-                        <i class="fas fa-user-plus"></i> Регистрация
-                    </button>
-                </form>
-                
-                <form class="auth-form" id="registerForm" style="display: none;">
-                    <input type="text" id="regUsername" placeholder="Имя пользователя" required>
-                    <input type="password" id="regPassword" placeholder="Пароль" required>
-                    <input type="password" id="regConfirm" placeholder="Повторите пароль" required>
-                    <button type="submit" class="btn" style="width: 100%;">
-                        <i class="fas fa-user-plus"></i> Зарегистрироваться
-                    </button>
-                    <button type="button" class="btn" onclick="showLogin()" style="width: 100%; margin-top: 10px;">
-                        <i class="fas fa-sign-in-alt"></i> Назад к входу
-                    </button>
-                </form>
+        <!-- Шапка -->
+        <div class="header">
+            <div class="logo">📝 Блог с Квантами</div>
+            <div id="userPanel">
+                <!-- Будет заполнено скриптом -->
             </div>
-            
-            <ul class="nav-menu" id="navMenu">
-                <li class="nav-item active" data-section="feed">
-                    <i class="fas fa-stream"></i> Лента
-                </li>
-                <li class="nav-item" data-section="profile">
-                    <i class="fas fa-user"></i> Профиль
-                </li>
-                <li class="nav-item" data-section="create-post">
-                    <i class="fas fa-edit"></i> Новый пост
-                </li>
-                <li class="nav-item" data-section="admin" id="adminNav" style="display: none;">
-                    <i class="fas fa-crown"></i> Админка
-                    <span class="admin-badge">ADMIN</span>
-                </li>
-            </ul>
+        </div>
+        
+        <!-- Навигация -->
+        <div class="nav" id="navigation" style="display: none;">
+            <button class="nav-btn active" data-section="feed">Лента</button>
+            <button class="nav-btn" data-section="create">Новый пост</button>
+            <button class="nav-btn" data-section="profile">Профиль</button>
+            <button class="nav-btn" data-section="admin" id="adminBtn" style="display: none;">Админка</button>
         </div>
         
         <!-- Основной контент -->
-        <div class="main-content">
-            <!-- Лента -->
-            <div class="content-section active" id="feedSection">
-                <h2><i class="fas fa-stream"></i> Последние посты</h2>
-                <div id="postsList" style="margin-top: 20px;"></div>
-            </div>
-            
-            <!-- Профиль -->
-            <div class="content-section" id="profileSection">
-                <h2><i class="fas fa-user"></i> Мой профиль</h2>
-                <div id="profileContent" style="margin-top: 20px;"></div>
-            </div>
-            
-            <!-- Создание поста -->
-            <div class="content-section" id="createPostSection">
-                <h2><i class="fas fa-edit"></i> Создать пост</h2>
-                <form id="postForm" style="margin-top: 20px;">
-                    <textarea 
-                        id="postContent" 
-                        placeholder="Что у вас нового?..." 
-                        required
-                    ></textarea>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <small>За пост вы получите <strong>5 квантов</strong></small>
-                        </div>
-                        <button type="submit" class="btn" id="submitBtn">
-                            <i class="fas fa-paper-plane"></i> Опубликовать
-                        </button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Админка -->
-            <div class="content-section" id="adminSection">
-                <h2><i class="fas fa-crown"></i> Панель администратора</h2>
-                <div id="adminContent" style="margin-top: 20px;"></div>
-            </div>
+        <div class="content" id="content">
+            <!-- Здесь будет контент -->
         </div>
     </div>
 
     <script>
         const API_URL = '/api/blog';
         let currentUser = null;
-        let allUsers = [];
         
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             checkAuth();
-            setupNavigation();
         });
         
         // Проверка авторизации
@@ -475,141 +326,65 @@
             if (token && user) {
                 try {
                     currentUser = JSON.parse(user);
-                    await loadUserData();
                     showUserPanel();
-                    showSection('feed');
-                    if (currentUser.role === 'admin') {
-                        document.getElementById('adminNav').style.display = 'flex';
-                    }
+                    showNavigation();
+                    loadFeed();
                 } catch (e) {
                     logout();
                 }
             } else {
-                showLoginPanel();
-                showSection('feed');
+                showLoginForm();
             }
-        }
-        
-        // Загрузить данные пользователя
-        async function loadUserData() {
-            try {
-                const response = await fetch(`${API_URL}/me`, {
-                    headers: getAuthHeaders()
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    currentUser = { ...currentUser, ...data };
-                    localStorage.setItem('blog_user', JSON.stringify(currentUser));
-                    updateUserPanel();
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки данных:', error);
-            }
-        }
-        
-        // Обновить панель пользователя
-        function updateUserPanel() {
-            if (currentUser) {
-                document.getElementById('userAvatar').textContent = 
-                    currentUser.username.charAt(0).toUpperCase();
-                document.getElementById('userName').textContent = currentUser.username;
-                document.getElementById('userRole').textContent = 
-                    currentUser.role === 'admin' ? 'Администратор' : 'Пользователь';
-                document.getElementById('quantaAmount').textContent = currentUser.quanta || 0;
-                
-                // Обновить цвет баджа для админа
-                const badge = document.getElementById('quantaBadge');
-                if (currentUser.role === 'admin') {
-                    badge.style.background = 'linear-gradient(135deg, #ff4757 0%, #ff3742 100%)';
-                }
-            }
-        }
-        
-        // Показать панель пользователя
-        function showUserPanel() {
-            document.getElementById('userInfo').style.display = 'block';
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'none';
         }
         
         // Показать форму входа
-        function showLoginPanel() {
-            document.getElementById('userInfo').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').style.display = 'none';
+        function showLoginForm() {
+            document.getElementById('userPanel').innerHTML = `
+                <div class="auth-box">
+                    <form id="loginForm" class="auth-form">
+                        <input type="text" id="username" placeholder="Имя пользователя" required>
+                        <input type="password" id="password" placeholder="Пароль" required>
+                        <button type="submit" class="btn">Войти</button>
+                        <button type="button" class="btn" onclick="showRegisterForm()">Регистрация</button>
+                    </form>
+                    
+                    <div id="registerForm" style="display: none; margin-top: 15px;">
+                        <form id="registerFormInner" class="auth-form">
+                            <input type="text" id="regUsername" placeholder="Имя пользователя" required>
+                            <input type="password" id="regPassword" placeholder="Пароль" required>
+                            <input type="password" id="regConfirm" placeholder="Повторите пароль" required>
+                            <button type="submit" class="btn">Зарегистрироваться</button>
+                            <button type="button" class="btn" onclick="showLoginForm()">Назад</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            // Обработка входа
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await login();
+            });
         }
         
         // Показать форму регистрации
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
+        function showRegisterForm() {
             document.getElementById('registerForm').style.display = 'block';
-        }
-        
-        // Показать форму входа
-        function showLogin() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').style.display = 'none';
-        }
-        
-        // Навигация
-        function setupNavigation() {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const section = item.dataset.section;
-                    showSection(section);
-                    
-                    // Обновить активный класс
-                    document.querySelectorAll('.nav-item').forEach(i => {
-                        i.classList.remove('active');
-                    });
-                    item.classList.add('active');
-                });
-            });
-        }
-        
-        // Показать раздел
-        function showSection(section) {
-            // Скрыть все разделы
-            document.querySelectorAll('.content-section').forEach(sec => {
-                sec.classList.remove('active');
-            });
+            document.getElementById('loginForm').style.display = 'none';
             
-            // Показать выбранный
-            document.getElementById(`${section}Section`).classList.add('active');
-            
-            // Загрузить данные для раздела
-            switch(section) {
-                case 'feed':
-                    loadPosts();
-                    break;
-                case 'profile':
-                    loadProfile();
-                    break;
-                case 'admin':
-                    loadAdminPanel();
-                    break;
-            }
-        }
-        
-        // Получить заголовки авторизации
-        function getAuthHeaders() {
-            const token = localStorage.getItem('blog_token');
-            return {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            };
+            document.getElementById('registerFormInner').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await register();
+            });
         }
         
         // Вход
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
+        async function login() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
             if (!username || !password) {
-                showNotification('Заполните все поля', 'error');
+                showMessage('Заполните все поля', 'error');
                 return;
             }
             
@@ -626,51 +401,39 @@
                     throw new Error(data.error || 'Ошибка входа');
                 }
                 
-                // Сохраняем токен и пользователя
                 localStorage.setItem('blog_token', data.token);
                 localStorage.setItem('blog_user', JSON.stringify(data.user));
                 
                 currentUser = data.user;
                 showUserPanel();
-                updateUserPanel();
-                loadPosts();
+                showNavigation();
+                loadFeed();
                 
-                if (currentUser.role === 'admin') {
-                    document.getElementById('adminNav').style.display = 'flex';
-                }
-                
-                showNotification('Успешный вход!', 'success');
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-                
-                // Показать ленту
-                showSection('feed');
+                showMessage('Успешный вход!', 'success');
                 
             } catch (error) {
-                showNotification(error.message, 'error');
+                showMessage(error.message, 'error');
             }
-        });
+        }
         
         // Регистрация
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
+        async function register() {
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
             const confirm = document.getElementById('regConfirm').value;
             
             if (!username || !password) {
-                showNotification('Заполните все поля', 'error');
+                showMessage('Заполните все поля', 'error');
                 return;
             }
             
             if (password !== confirm) {
-                showNotification('Пароли не совпадают', 'error');
+                showMessage('Пароли не совпадают', 'error');
                 return;
             }
             
             if (password.length < 4) {
-                showNotification('Пароль должен быть минимум 4 символа', 'error');
+                showMessage('Пароль должен быть минимум 4 символа', 'error');
                 return;
             }
             
@@ -687,130 +450,182 @@
                     throw new Error(data.error || 'Ошибка регистрации');
                 }
                 
-                showNotification('Регистрация успешна! Теперь войдите', 'success');
-                showLogin();
-                document.getElementById('regUsername').value = '';
-                document.getElementById('regPassword').value = '';
-                document.getElementById('regConfirm').value = '';
+                showMessage('Регистрация успешна! Теперь войдите', 'success');
+                showLoginForm();
                 
             } catch (error) {
-                showNotification(error.message, 'error');
+                showMessage(error.message, 'error');
             }
-        });
+        }
+        
+        // Показать панель пользователя
+        function showUserPanel() {
+            document.getElementById('userPanel').innerHTML = `
+                <div class="user-info">
+                    <div>
+                        <div style="font-weight: bold;">${currentUser.username}</div>
+                        <div class="user-badge ${currentUser.role === 'admin' ? 'admin' : ''}">
+                            ${currentUser.role === 'admin' ? '👑 Админ' : '👤 Пользователь'}
+                        </div>
+                    </div>
+                    <div class="quanta-badge">
+                        💎 ${currentUser.quanta || 0} квантов
+                    </div>
+                    <button class="btn btn-danger" onclick="logout()">Выйти</button>
+                </div>
+            `;
+        }
+        
+        // Показать навигацию
+        function showNavigation() {
+            const nav = document.getElementById('navigation');
+            nav.style.display = 'flex';
+            
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminBtn').style.display = 'block';
+            }
+            
+            // Обработка кликов по навигации
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Убрать активный класс у всех кнопок
+                    document.querySelectorAll('.nav-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    
+                    // Добавить активный класс текущей кнопке
+                    btn.classList.add('active');
+                    
+                    // Показать соответствующий раздел
+                    const section = btn.dataset.section;
+                    showSection(section);
+                });
+            });
+        }
         
         // Выход
-        document.getElementById('logoutBtn').addEventListener('click', logout);
-        
         function logout() {
             localStorage.removeItem('blog_token');
             localStorage.removeItem('blog_user');
             currentUser = null;
-            showLoginPanel();
-            showSection('feed');
-            document.getElementById('adminNav').style.display = 'none';
-            showNotification('Вы вышли из системы', 'info');
+            showLoginForm();
+            document.getElementById('navigation').style.display = 'none';
+            document.getElementById('content').innerHTML = '';
+            showMessage('Вы вышли из системы', 'info');
         }
         
-        // Загрузить посты
-        async function loadPosts() {
+        // Показать раздел
+        function showSection(section) {
+            const content = document.getElementById('content');
+            
+            switch(section) {
+                case 'feed':
+                    loadFeed();
+                    break;
+                case 'create':
+                    showCreatePost();
+                    break;
+                case 'profile':
+                    showProfile();
+                    break;
+                case 'admin':
+                    showAdminPanel();
+                    break;
+            }
+        }
+        
+        // Загрузить ленту
+        async function loadFeed() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loader">Загрузка постов...</div>';
+            
             try {
-                const response = await fetch(API_URL, {
-                    headers: getAuthHeaders()
-                });
+                const headers = {};
+                const token = localStorage.getItem('blog_token');
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(API_URL, { headers });
                 
                 if (!response.ok) throw new Error('Ошибка загрузки');
                 
                 const posts = await response.json();
-                renderPosts(posts);
+                
+                if (posts.length === 0) {
+                    content.innerHTML = '<p style="text-align: center; color: #666;">Пока нет постов</p>';
+                    return;
+                }
+                
+                content.innerHTML = `
+                    <div class="posts-list">
+                        ${posts.map(post => `
+                            <div class="post" data-id="${post.id}">
+                                <div class="post-header">
+                                    <div>
+                                        <div class="post-author">${post.authorName || 'Аноним'}</div>
+                                        <div class="post-date">${formatDate(post.createdAt)}</div>
+                                    </div>
+                                    ${post.canDelete ? `
+                                        <button class="btn btn-danger" onclick="deletePost('${post.id}')" 
+                                                style="padding: 5px 10px; font-size: 12px;">
+                                            Удалить
+                                        </button>
+                                    ` : ''}
+                                </div>
+                                <div class="post-content">${escapeHtml(post.content)}</div>
+                                <div style="color: #52c41a; font-size: 14px;">
+                                    <i class="fas fa-gem"></i> +5 квантов за пост
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
             } catch (error) {
-                showNotification('Не удалось загрузить посты', 'error');
-                document.getElementById('postsList').innerHTML = 
-                    '<p style="text-align: center; color: #666;">Ошибка загрузки</p>';
+                content.innerHTML = '<p style="text-align: center; color: #666;">Ошибка загрузки ленты</p>';
+                showMessage(error.message, 'error');
             }
         }
         
-        // Отобразить посты
-        function renderPosts(posts) {
-            const postsList = document.getElementById('postsList');
+        // Показать форму создания поста
+        function showCreatePost() {
+            const content = document.getElementById('content');
             
-            if (posts.length === 0) {
-                postsList.innerHTML = `
-                    <div style="text-align: center; padding: 50px; color: #666;">
-                        <i class="fas fa-feather-alt" style="font-size: 48px; margin-bottom: 20px; color: #ccc;"></i>
-                        <h3>Пока здесь пусто</h3>
-                        <p>Будьте первым, кто опубликует запись!</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            postsList.innerHTML = posts.map(post => {
-                const isOwner = currentUser && post.authorId === currentUser.id;
-                const canDelete = post.canDelete || isOwner;
-                const authorInitial = post.authorName ? post.authorName.charAt(0).toUpperCase() : 'U';
-                
-                return `
-                <div class="post">
-                    <div class="post-header">
-                        <div class="post-author">
-                            <div class="post-author-avatar">${authorInitial}</div>
-                            <div>
-                                <div style="font-weight: 600;">${post.authorName || 'Аноним'}</div>
-                                <small style="color: #666;">${formatDate(post.createdAt)}</small>
-                            </div>
-                        </div>
-                        ${canDelete ? `
-                            <button class="btn" onclick="deletePost('${post.id}')" 
-                                    style="padding: 8px 15px; font-size: 14px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="post-content">${escapeHtml(post.content)}</div>
-                    
-                    <div class="post-footer">
-                        <div>
-                            <small style="color: #4CAF50;">
-                                <i class="fas fa-gem"></i> +5 квантов
-                            </small>
-                        </div>
-                        ${currentUser && currentUser.role === 'admin' && !isOwner ? `
-                            <small style="color: #ff4757;">
-                                <i class="fas fa-crown"></i> Удалено администратором
-                            </small>
-                        ` : ''}
+            content.innerHTML = `
+                <div class="post-form">
+                    <h3 style="margin-bottom: 15px;">Новый пост</h3>
+                    <textarea id="newPostContent" placeholder="Что у вас нового?..." required></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <small>За пост вы получите <strong>5 квантов</strong></small>
+                        <button class="btn" onclick="createPost()">Опубликовать</button>
                     </div>
                 </div>
-                `;
-            }).join('');
+            `;
         }
         
         // Создать пост
-        document.getElementById('postForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!currentUser) {
-                showNotification('Войдите, чтобы публиковать', 'error');
-                showLoginPanel();
-                return;
-            }
-            
-            const content = document.getElementById('postContent').value.trim();
-            const submitBtn = document.getElementById('submitBtn');
+        async function createPost() {
+            const content = document.getElementById('newPostContent').value.trim();
             
             if (!content) {
-                showNotification('Напишите что-нибудь', 'error');
+                showMessage('Напишите что-нибудь', 'error');
                 return;
             }
             
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Публикую...';
+            if (!currentUser) {
+                showMessage('Войдите, чтобы публиковать', 'error');
+                return;
+            }
             
             try {
+                const token = localStorage.getItem('blog_token');
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: getAuthHeaders(),
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ content })
                 });
                 
@@ -820,34 +635,37 @@
                     throw new Error(data.error || 'Ошибка публикации');
                 }
                 
-                document.getElementById('postContent').value = '';
-                showNotification(`Пост опубликован! +${data.quantaEarned} квантов`, 'success');
+                showMessage(`Пост опубликован! +${data.quantaEarned} квантов`, 'success');
                 
                 // Обновить баланс
                 currentUser.quanta = data.newBalance;
-                updateUserPanel();
                 localStorage.setItem('blog_user', JSON.stringify(currentUser));
+                showUserPanel();
                 
-                // Загрузить обновленные посты
-                loadPosts();
+                // Вернуться в ленту
                 showSection('feed');
                 
             } catch (error) {
-                showNotification(error.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Опубликовать';
+                showMessage(error.message, 'error');
             }
-        });
+        }
         
         // Удалить пост
         async function deletePost(id) {
             if (!confirm('Удалить этот пост?')) return;
             
+            if (!currentUser) {
+                showMessage('Войдите, чтобы удалять посты', 'error');
+                return;
+            }
+            
             try {
+                const token = localStorage.getItem('blog_token');
                 const response = await fetch(`${API_URL}?id=${id}`, {
                     method: 'DELETE',
-                    headers: getAuthHeaders()
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 
                 const data = await response.json();
@@ -856,48 +674,52 @@
                     throw new Error(data.error || 'Ошибка удаления');
                 }
                 
-                showNotification('Пост удалён' + (data.deletedByAdmin ? ' (администратором)' : ''), 'success');
-                loadPosts();
+                showMessage('Пост удалён', 'success');
+                loadFeed();
+                
             } catch (error) {
-                showNotification(error.message, 'error');
+                showMessage(error.message, 'error');
             }
         }
         
-        // Загрузить профиль
-        async function loadProfile() {
+        // Показать профиль
+        async function showProfile() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loader">Загрузка профиля...</div>';
+            
             if (!currentUser) {
-                document.getElementById('profileContent').innerHTML = `
-                    <p style="text-align: center; color: #666;">
-                        Войдите, чтобы увидеть профиль
-                    </p>
-                `;
+                content.innerHTML = '<p>Войдите, чтобы увидеть профиль</p>';
                 return;
             }
             
             try {
+                const token = localStorage.getItem('blog_token');
                 const response = await fetch(`${API_URL}/me`, {
-                    headers: getAuthHeaders()
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 
                 if (!response.ok) throw new Error('Ошибка загрузки');
                 
                 const data = await response.json();
                 
-                document.getElementById('profileContent').innerHTML = `
-                    <div class="admin-card">
-                        <h3><i class="fas fa-user-circle"></i> Информация</h3>
+                content.innerHTML = `
+                    <h3 style="margin-bottom: 20px;">Мой профиль</h3>
+                    
+                    <div class="admin-card" style="margin-bottom: 20px;">
                         <p><strong>Имя:</strong> ${data.username}</p>
                         <p><strong>Роль:</strong> ${data.role === 'admin' ? 'Администратор' : 'Пользователь'}</p>
-                        <p><strong>Кванты:</strong> <span style="color: #ff8c00; font-weight: bold;">
-                            <i class="fas fa-gem"></i> ${data.quanta}
+                        <p><strong>Кванты:</strong> <span style="color: #faad14; font-weight: bold;">
+                            💎 ${data.quanta}
                         </span></p>
                         <p><strong>Постов:</strong> ${data.postCount || 0}</p>
                         <p><strong>Зарегистрирован:</strong> ${formatDate(data.createdAt)}</p>
                     </div>
                     
                     ${data.recentTransactions && data.recentTransactions.length > 0 ? `
-                    <div class="admin-card" style="margin-top: 20px;">
-                        <h3><i class="fas fa-history"></i> Последние транзакции</h3>
+                    <div class="admin-card">
+                        <h4 style="margin-bottom: 15px;">Последние операции</h4>
                         <div style="max-height: 300px; overflow-y: auto;">
                             ${data.recentTransactions.map(t => `
                                 <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
@@ -905,7 +727,7 @@
                                         <div>${t.reason}</div>
                                         <small style="color: #666;">${formatDate(t.timestamp)}</small>
                                     </div>
-                                    <div style="color: ${t.amount > 0 ? '#4CAF50' : '#f44336'}; font-weight: bold;">
+                                    <div style="color: ${t.amount > 0 ? '#52c41a' : '#ff4d4f'}; font-weight: bold;">
                                         ${t.amount > 0 ? '+' : ''}${t.amount} квантов
                                     </div>
                                 </div>
@@ -914,31 +736,34 @@
                     </div>
                     ` : ''}
                 `;
+                
             } catch (error) {
-                document.getElementById('profileContent').innerHTML = `
-                    <p style="text-align: center; color: #666;">
-                        Ошибка загрузки профиля
-                    </p>
-                `;
+                content.innerHTML = '<p style="color: #666;">Ошибка загрузки профиля</p>';
             }
         }
         
-        // Загрузить админ-панель
-        async function loadAdminPanel() {
+        // Показать админ-панель
+        async function showAdminPanel() {
+            const content = document.getElementById('content');
+            
             if (!currentUser || currentUser.role !== 'admin') {
-                document.getElementById('adminContent').innerHTML = `
-                    <p style="text-align: center; color: #666;">
-                        Требуются права администратора
-                    </p>
-                `;
+                content.innerHTML = '<p style="color: #666;">Требуются права администратора</p>';
                 return;
             }
             
+            content.innerHTML = '<div class="loader">Загрузка админ-панели...</div>';
+            
             try {
-                // Загружаем статистику
+                const token = localStorage.getItem('blog_token');
+                
+                // Загружаем статистику и пользователей
                 const [statsResponse, usersResponse] = await Promise.all([
-                    fetch(`${API_URL}/admin/stats`, { headers: getAuthHeaders() }),
-                    fetch(`${API_URL}/admin/users`, { headers: getAuthHeaders() })
+                    fetch(`${API_URL}/admin/stats`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_URL}/admin/users`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
                 ]);
                 
                 if (!statsResponse.ok || !usersResponse.ok) {
@@ -947,72 +772,70 @@
                 
                 const stats = await statsResponse.json();
                 const users = await usersResponse.json();
-                allUsers = users;
                 
-                // Отображаем админ-панель
-                document.getElementById('adminContent').innerHTML = `
+                content.innerHTML = `
+                    <h3 style="margin-bottom: 20px;">👑 Админ-панель</h3>
+                    
                     <div class="admin-grid">
                         <div class="admin-card">
-                            <h3><i class="fas fa-chart-bar"></i> Статистика</h3>
-                            <div class="admin-stats">
-                                <div class="stat-item">
+                            <h4 style="margin-bottom: 15px;">Статистика</h4>
+                            <div class="stats-grid">
+                                <div class="stat">
                                     <div class="stat-value">${stats.totalUsers}</div>
-                                    <div class="stat-label">Пользователей</div>
+                                    <div>Пользователей</div>
                                 </div>
-                                <div class="stat-item">
+                                <div class="stat">
                                     <div class="stat-value">${stats.totalPosts}</div>
-                                    <div class="stat-label">Постов</div>
+                                    <div>Постов</div>
                                 </div>
-                                <div class="stat-item">
+                                <div class="stat">
                                     <div class="stat-value">${stats.totalQuanta}</div>
-                                    <div class="stat-label">Всего квантов</div>
+                                    <div>Всего квантов</div>
                                 </div>
-                                <div class="stat-item">
+                                <div class="stat">
                                     <div class="stat-value">${stats.settings.quantaPerPost}</div>
-                                    <div class="stat-label">Квантов за пост</div>
+                                    <div>За пост</div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="admin-card">
-                            <h3><i class="fas fa-coins"></i> Добавить кванты</h3>
-                            <form id="addQuantaForm">
-                                <select id="quantaUserSelect" required>
+                            <h4 style="margin-bottom: 15px;">Добавить кванты</h4>
+                            <form id="addQuantaForm" onsubmit="addQuanta(event)">
+                                <select id="quantaUser" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
                                     <option value="">Выберите пользователя</option>
-                                    ${users.map(u => `
-                                        <option value="${u.id}">${u.username} (${u.quanta} квантов)</option>
+                                    ${users.map(user => `
+                                        <option value="${user.id}">
+                                            ${user.username} (${user.quanta} квантов)
+                                        </option>
                                     `).join('')}
                                 </select>
-                                <input type="number" id="quantaAmount" placeholder="Количество" min="1" required>
-                                <input type="text" id="quantaReason" placeholder="Причина" required>
-                                <button type="submit" class="btn btn-admin" style="width: 100%;">
-                                    <i class="fas fa-plus"></i> Добавить кванты
-                                </button>
+                                <input type="number" id="quantaAmount" placeholder="Количество" 
+                                       min="1" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                                <input type="text" id="quantaReason" placeholder="Причина" 
+                                       required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                                <button type="submit" class="btn" style="width: 100%;">Добавить</button>
                             </form>
                         </div>
                     </div>
                     
                     <div class="admin-card" style="margin-top: 20px;">
-                        <h3><i class="fas fa-users"></i> Пользователи</h3>
-                        <div class="user-list">
+                        <h4 style="margin-bottom: 15px;">Пользователи</h4>
+                        <div style="max-height: 400px; overflow-y: auto;">
                             ${users.map(user => `
-                                <div class="user-item">
+                                <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
                                     <div>
-                                        <div style="font-weight: 600;">${user.username}</div>
+                                        <div style="font-weight: bold;">${user.username}</div>
                                         <small style="color: #666;">
                                             ${user.role === 'admin' ? '👑 Админ' : '👤 Пользователь'} • 
                                             ${user.postCount} постов • 
-                                            <i class="fas fa-gem"></i> ${user.quanta} квантов
+                                            💎 ${user.quanta} квантов
                                         </small>
                                     </div>
-                                    <div class="user-actions">
-                                        <button class="btn" onclick="viewUserDetails('${user.id}')" 
-                                                style="padding: 8px 15px; font-size: 14px;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-admin" onclick="quickAddQuanta('${user.id}', '${user.username}')"
-                                                style="padding: 8px 15px; font-size: 14px;">
-                                            <i class="fas fa-plus"></i>
+                                    <div>
+                                        <button class="btn" onclick="viewUser('${user.id}')" 
+                                                style="padding: 5px 10px; font-size: 12px;">
+                                            Подробнее
                                         </button>
                                     </div>
                                 </div>
@@ -1021,70 +844,33 @@
                     </div>
                 `;
                 
-                // Обработка формы добавления квантов
-                document.getElementById('addQuantaForm').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    
-                    const userId = document.getElementById('quantaUserSelect').value;
-                    const amount = parseInt(document.getElementById('quantaAmount').value);
-                    const reason = document.getElementById('quantaReason').value;
-                    
-                    if (!userId || !amount || !reason) {
-                        showNotification('Заполните все поля', 'error');
-                        return;
-                    }
-                    
-                    try {
-                        const response = await fetch(`${API_URL}/admin/add-quanta`, {
-                            method: 'POST',
-                            headers: getAuthHeaders(),
-                            body: JSON.stringify({ userId, amount, reason })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (!response.ok) {
-                            throw new Error(data.error || 'Ошибка');
-                        }
-                        
-                        showNotification(`Добавлено ${amount} квантов`, 'success');
-                        
-                        // Сбросить форму
-                        document.getElementById('addQuantaForm').reset();
-                        
-                        // Обновить панель
-                        loadAdminPanel();
-                        
-                    } catch (error) {
-                        showNotification(error.message, 'error');
-                    }
-                });
-                
             } catch (error) {
-                document.getElementById('adminContent').innerHTML = `
-                    <p style="text-align: center; color: #666;">
-                        Ошибка загрузки админ-панели: ${error.message}
-                    </p>
-                `;
+                content.innerHTML = '<p style="color: #666;">Ошибка загрузки админ-панели</p>';
+                showMessage(error.message, 'error');
             }
         }
         
-        // Быстро добавить кванты
-        function quickAddQuanta(userId, username) {
-            const amount = prompt(`Сколько квантов добавить пользователю ${username}?`, '10');
-            const reason = prompt('Причина начисления:', 'Бонус от администратора');
+        // Добавить кванты (админ)
+        async function addQuanta(event) {
+            event.preventDefault();
             
-            if (amount && reason) {
-                addQuantaToUser(userId, parseInt(amount), reason);
+            const userId = document.getElementById('quantaUser').value;
+            const amount = parseInt(document.getElementById('quantaAmount').value);
+            const reason = document.getElementById('quantaReason').value;
+            
+            if (!userId || !amount || !reason) {
+                showMessage('Заполните все поля', 'error');
+                return;
             }
-        }
-        
-        // Добавить кванты пользователю
-        async function addQuantaToUser(userId, amount, reason) {
+            
             try {
+                const token = localStorage.getItem('blog_token');
                 const response = await fetch(`${API_URL}/admin/add-quanta`, {
                     method: 'POST',
-                    headers: getAuthHeaders(),
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ userId, amount, reason })
                 });
                 
@@ -1094,110 +880,63 @@
                     throw new Error(data.error || 'Ошибка');
                 }
                 
-                showNotification(`Добавлено ${amount} квантов`, 'success');
-                loadAdminPanel();
+                showMessage(`Добавлено ${amount} квантов`, 'success');
+                showAdminPanel();
                 
             } catch (error) {
-                showNotification(error.message, 'error');
+                showMessage(error.message, 'error');
             }
         }
         
-        // Просмотреть детали пользователя
-        async function viewUserDetails(userId) {
+        // Просмотреть пользователя
+        async function viewUser(userId) {
             try {
+                const token = localStorage.getItem('blog_token');
                 const response = await fetch(`${API_URL}/admin/user/${userId}`, {
-                    headers: getAuthHeaders()
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
                 if (!response.ok) throw new Error('Ошибка загрузки');
                 
                 const user = await response.json();
                 
-                // Показать модальное окно с деталями
-                const modalContent = `
-                    <div style="background: white; border-radius: 15px; padding: 30px; max-width: 500px;">
-                        <h3 style="margin-bottom: 20px;">${user.username}</h3>
-                        
-                        <div style="margin-bottom: 20px;">
+                const modal = `
+                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                         background: rgba(0,0,0,0.5); display: flex; justify-content: center; 
+                         align-items: center; z-index: 1000;">
+                        <div style="background: white; padding: 20px; border-radius: 10px; 
+                             max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                            <h3 style="margin-bottom: 15px;">${user.username}</h3>
+                            
                             <p><strong>ID:</strong> ${user.id}</p>
                             <p><strong>Роль:</strong> ${user.role === 'admin' ? 'Администратор' : 'Пользователь'}</p>
-                            <p><strong>Кванты:</strong> <span style="color: #ff8c00; font-weight: bold;">
-                                <i class="fas fa-gem"></i> ${user.quanta}
-                            </span></p>
-                            <p><strong>Зарегистрирован:</strong> ${formatDate(user.createdAt)}</p>
+                            <p><strong>Кванты:</strong> 💎 ${user.quanta}</p>
                             <p><strong>Постов:</strong> ${user.posts?.length || 0}</p>
-                        </div>
-                        
-                        ${user.posts && user.posts.length > 0 ? `
-                        <div style="margin-bottom: 20px;">
-                            <h4>Последние посты:</h4>
-                            <div style="max-height: 200px; overflow-y: auto;">
-                                ${user.posts.slice(0, 5).map(post => `
-                                    <div style="padding: 10px; background: #f5f5f5; border-radius: 8px; margin-bottom: 10px;">
-                                        <div style="font-size: 14px; margin-bottom: 5px;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
-                                        <small style="color: #666;">${formatDate(post.createdAt)}</small>
+                            
+                            ${user.posts && user.posts.length > 0 ? `
+                            <div style="margin-top: 15px;">
+                                <h4>Последние посты:</h4>
+                                ${user.posts.slice(0, 3).map(post => `
+                                    <div style="background: #f5f5f5; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                                        ${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}
                                     </div>
                                 `).join('')}
                             </div>
-                        </div>
-                        ` : ''}
-                        
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn" onclick="quickAddQuanta('${user.id}', '${user.username}')" style="flex: 1;">
-                                <i class="fas fa-plus"></i> Добавить кванты
-                            </button>
-                            <button class="btn" onclick="closeModal()" style="flex: 1;">
+                            ` : ''}
+                            
+                            <button class="btn" onclick="this.parentElement.parentElement.remove()" 
+                                    style="margin-top: 15px; width: 100%;">
                                 Закрыть
                             </button>
                         </div>
                     </div>
                 `;
                 
-                showModal(modalContent);
+                document.body.insertAdjacentHTML('beforeend', modal);
                 
             } catch (error) {
-                showNotification(error.message, 'error');
+                showMessage(error.message, 'error');
             }
-        }
-        
-        // Модальное окно
-        function showModal(content) {
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-                animation: fadeIn 0.3s ease;
-            `;
-            
-            modal.innerHTML = content;
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-            
-            document.body.appendChild(modal);
-            
-            // Добавить анимацию
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        
-        function closeModal() {
-            const modal = document.querySelector('div[style*="position: fixed"]');
-            if (modal) modal.remove();
         }
         
         // Вспомогательные функции
@@ -1218,16 +957,15 @@
             return div.innerHTML.replace(/\n/g, '<br>');
         }
         
-        function showNotification(message, type = 'info') {
+        function showMessage(text, type = 'info') {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
-            notification.textContent = message;
+            notification.textContent = text;
             
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
+                notification.remove();
             }, 3000);
         }
     </script>
