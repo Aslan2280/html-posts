@@ -17,6 +17,7 @@
             color: #ffffff;
             overflow-x: hidden;
             position: relative;
+            line-height: 1.6;
         }
 
         /* Animated background particles */
@@ -389,46 +390,293 @@
             color: #666;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .title {
-                font-size: 2.5em;
-                letter-spacing: 5px;
-            }
-            
-            .subtitle {
-                font-size: 1.2em;
-            }
-            
-            section {
-                padding: 20px;
-            }
-            
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Fade in animation */
-        @keyframes fadeInSimple {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .fade-in {
-            animation: fadeInSimple 1s ease-out;
-        }
-
         /* Line decoration */
         .line-decoration {
             width: 50px;
             height: 1px;
             background: #666;
             margin: 20px 0;
+        }
+
+        /* ========================================
+           MOBILE RESPONSIVE STYLES
+           ======================================== */
+        
+        /* Tablets and small laptops */
+        @media (max-width: 1024px) {
+            .title {
+                font-size: 3em;
+                letter-spacing: 8px;
+            }
+            
+            main {
+                padding: 30px 15px;
+            }
+            
+            section {
+                padding: 30px;
+            }
+        }
+
+        /* Mobile devices */
+        @media (max-width: 768px) {
+            /* Header adjustments */
+            header {
+                padding: 40px 15px;
+            }
+            
+            .title {
+                font-size: 2.2em;
+                letter-spacing: 5px;
+            }
+            
+            .subtitle {
+                font-size: 1.1em;
+                margin-top: 15px;
+            }
+            
+            /* Main content adjustments */
+            main {
+                padding: 20px 15px;
+            }
+            
+            section {
+                padding: 25px 20px;
+                margin-bottom: 40px;
+            }
+            
+            h2 {
+                font-size: 1.6em;
+                letter-spacing: 2px;
+            }
+            
+            p {
+                font-size: 0.95em;
+                line-height: 1.7;
+            }
+            
+            /* Skills grid - single column on mobile */
+            .skills-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .skill-card {
+                padding: 15px;
+            }
+            
+            .skill-card h3 {
+                font-size: 1.1em;
+            }
+            
+            /* Projects grid - single column on mobile */
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .project-card {
+                padding: 20px;
+            }
+            
+            .project-card h3 {
+                font-size: 1.3em;
+            }
+            
+            /* Contact button */
+            .contact-btn {
+                padding: 12px 30px;
+                font-size: 1em;
+                width: 100%;
+                text-align: center;
+            }
+            
+            /* Floating icons - hide on mobile for better performance */
+            .floating-icon {
+                display: none;
+            }
+            
+            /* Reduce particle count on mobile */
+            .particle {
+                width: 1px;
+                height: 1px;
+            }
+        }
+
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            header {
+                padding: 30px 10px;
+            }
+            
+            .title {
+                font-size: 1.8em;
+                letter-spacing: 3px;
+            }
+            
+            .subtitle {
+                font-size: 0.95em;
+            }
+            
+            main {
+                padding: 15px 10px;
+            }
+            
+            section {
+                padding: 20px 15px;
+                margin-bottom: 30px;
+            }
+            
+            h2 {
+                font-size: 1.4em;
+                letter-spacing: 1px;
+            }
+            
+            p {
+                font-size: 0.9em;
+                line-height: 1.6;
+            }
+            
+            .line-decoration {
+                width: 40px;
+                margin: 15px 0;
+            }
+            
+            .skill-card {
+                padding: 12px;
+            }
+            
+            .project-card {
+                padding: 15px;
+            }
+            
+            .project-link {
+                padding: 8px 15px;
+                font-size: 0.9em;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .contact-btn {
+                padding: 12px 25px;
+                font-size: 0.95em;
+            }
+            
+            footer {
+                padding: 30px 15px;
+            }
+            
+            footer p {
+                font-size: 0.85em;
+            }
+        }
+
+        /* Very small devices */
+        @media (max-width: 360px) {
+            .title {
+                font-size: 1.5em;
+                letter-spacing: 2px;
+            }
+            
+            .subtitle {
+                font-size: 0.85em;
+            }
+            
+            section {
+                padding: 15px 12px;
+            }
+            
+            h2 {
+                font-size: 1.2em;
+            }
+            
+            p {
+                font-size: 0.85em;
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            header {
+                padding: 25px 15px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            section {
+                padding: 20px 15px;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Remove hover effects on touch devices */
+            section:hover {
+                border-color: #333;
+                background: rgba(20, 20, 20, 0.6);
+            }
+            
+            .skill-card:hover {
+                transform: none;
+            }
+            
+            .project-card:hover {
+                transform: none;
+            }
+            
+            .contact-btn:hover {
+                transform: none;
+            }
+            
+            /* Make touch targets larger */
+            .project-link {
+                padding: 12px 20px;
+            }
+            
+            .contact-btn {
+                padding: 15px 35px;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .particle {
+                width: 1px;
+                height: 1px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .particles,
+            .matrix-rain,
+            .floating-icon {
+                display: none;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+            
+            section {
+                background: white;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
@@ -603,7 +851,9 @@
         // Create floating particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
-            const particleCount = 50;
+            // Reduce particle count on mobile
+            const isMobile = window.innerWidth <= 768;
+            const particleCount = isMobile ? 20 : 50;
             
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -618,18 +868,20 @@
         // Create matrix rain
         function createMatrixRain() {
             const matrixContainer = document.getElementById('matrixRain');
-            const columns = Math.floor(window.innerWidth / 20);
+            const isMobile = window.innerWidth <= 768;
+            const columns = Math.floor(window.innerWidth / (isMobile ? 30 : 20));
             const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
             
             for (let i = 0; i < columns; i++) {
                 const column = document.createElement('div');
                 column.className = 'matrix-column';
-                column.style.left = (i * 20) + 'px';
+                column.style.left = (i * (isMobile ? 30 : 20)) + 'px';
                 column.style.animationDuration = (Math.random() * 5 + 5) + 's';
                 column.style.animationDelay = Math.random() * 5 + 's';
                 
                 let text = '';
-                for (let j = 0; j < 20; j++) {
+                const lines = isMobile ? 10 : 20;
+                for (let j = 0; j < lines; j++) {
                     text += chars[Math.floor(Math.random() * chars.length)] + '<br>';
                 }
                 column.innerHTML = text;
@@ -664,16 +916,31 @@
             setupScrollAnimations();
         });
 
-        // Parallax effect on scroll
+        // Parallax effect on scroll (disabled on mobile for performance)
         window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const parallaxElements = document.querySelectorAll('.floating-icon');
-            
-            parallaxElements.forEach((el, index) => {
-                const speed = 0.5 + (index * 0.1);
-                el.style.transform = `translateY(${scrolled * speed}px)`;
-            });
+            if (window.innerWidth > 768) {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('.floating-icon');
+                
+                parallaxElements.forEach((el, index) => {
+                    const speed = 0.5 + (index * 0.1);
+                    el.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            }
         });
+
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // Reload page on significant resize to adjust effects
+                if (Math.abs(window.innerWidth - window.lastWidth) > 100) {
+                    location.reload();
+                }
+            }, 250);
+        });
+        window.lastWidth = window.innerWidth;
 
         // Console Easter Egg
         console.log('%cПривет! Ты нашел секретное сообщение!', 'color: #ffffff; font-size: 20px; font-weight: bold;');
